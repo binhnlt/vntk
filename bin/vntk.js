@@ -4,14 +4,13 @@
  * Module dependencies
  */
 
-var _ = require("lodash")
-    , async = require("async")
-    , program = require("commander")
-    , vntk = require("../lib/vntk")
-    , package = require("../package.json")
-    ;
+var _ = require("lodash"),
+    async = require("async"),
+    program = require("commander"),
+    vntk = require("../lib/vntk"),
+    package = require("../package.json");
 
-var NOOP = function () { };
+var NOOP = function () {};
 var help = function () {
     // Allow us to display help(), but omit the wildcard (*) command.
     program.commands = _.reject(program.commands, {
@@ -48,26 +47,44 @@ program
     .alias("ws")
     .description("word segmentation")
     .option("-f, --file", "input is files")
+    .option("--json", "output as json")
     .action(function (text, options) {
-        console.log('input: %s', text);
-        console.log('isFile: %s', !!options.file);
-        // console.log("typeof text: ", typeof text);
+
+        if (!options.json) {
+            console.log('input: %s', text);
+            console.log('isFile: %s', !!options.file);
+            // console.log("typeof text: ", typeof text);
+        }
 
         // check input
         var input = text + "";
         if (!input) {
-            console.log("input is required");
-            this.emit("--help");
+            if (!options.json) {
+                console.log("input is required");
+                this.emit("--help");
+            } else
+                console.log(JSON.stringify({
+                    'errors': ['Input is required']
+                }));
             return;
         }
-        
+
         var ws = vntk.word_sent;
 
         if (!options.file) {
             text.forEach(function (e) {
-                console.log(e);
-                var seg = ws.tag(e, 'text');
-                console.log("Output:", seg);
+                // console.log(e);
+                if (options.json) {
+                    var seg = ws.tag(e);
+                    console.log(JSON.stringify({
+                        input: text,
+                        is_file: !!options.file,
+                        output: seg
+                    }));
+                } else {
+                    var seg = ws.tag(e, 'text');
+                    console.log("Output:", seg);
+                }
             }, this);
         } else {
             text.forEach(function (e) {
@@ -166,7 +183,7 @@ program
         if (!options.file) {
             text.forEach(function (e) {
                 console.log(e);
-                if(options.string)
+                if (options.string)
                     var seg = tokenizer.stokenize(e);
                 else
                     var seg = tokenizer.tokenize(e);
@@ -174,7 +191,7 @@ program
             }, this);
         } else {
             text.forEach(function (e) {
-                if(options.string)
+                if (options.string)
                     var seg = tokenizer.stokenize(e);
                 else
                     var seg = tokenizer.tokenize(e);
