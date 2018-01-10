@@ -163,18 +163,24 @@ program
     .alias("tok")
     .description("Word Tokenizer")
     .option("-f, --file", "input is files")
-    .option("-s, --string", "output as string")
+    .option("--json", "output as json")
     .action(function (text, options) {
-        console.log('input: %s', text);
-        console.log('isFile: %s', !!options.file);
-        console.log('string', options.string);
-        // console.log("typeof text: ", typeof text);
+        if (!options.json) {
+            console.log('input: %s', text);
+            console.log('isFile: %s', !!options.file);
+            // console.log("typeof text: ", typeof text);
+        }
 
         // check input
         var input = text + "";
         if (!input) {
-            console.log("input is required");
-            this.emit("--help");
+            if (!options.json) {
+                console.log("input is required");
+                this.emit("--help");
+            } else
+                console.log(JSON.stringify({
+                    'errors': ['Input is required']
+                }));
             return;
         }
 
@@ -182,20 +188,31 @@ program
 
         if (!options.file) {
             text.forEach(function (e) {
-                console.log(e);
-                if (options.string)
-                    var seg = tokenizer.stokenize(e);
-                else
+                if (options.json) {
                     var seg = tokenizer.tokenize(e);
-                console.log("Output:", seg);
+                    console.log(JSON.stringify({
+                        input: text,
+                        is_file: !!options.file,
+                        output: seg
+                    }));
+                } else {
+                    var seg = tokenizer.stokenize(e);
+                    console.log("Output:", seg);
+                }
             }, this);
         } else {
             text.forEach(function (e) {
-                if (options.string)
-                    var seg = tokenizer.stokenize(e);
-                else
+                if (options.json) {
                     var seg = tokenizer.tokenize(e);
-                console.log(seg);
+                    console.log(JSON.stringify({
+                        input: text,
+                        is_file: !!options.file,
+                        output: seg
+                    }));
+                } else {
+                    var seg = tokenizer.stokenize(e);
+                    console.log("Output:", seg);
+                }
             }, this);
         }
 
@@ -203,9 +220,7 @@ program
         console.log('  Examples:');
         console.log();
         console.log('    $ vntk tokenize "Giá khuyến mãi: 140.000đ / kg  ==> giảm được 20%"');
-        console.log('    $ vntk tokenize "Giá khuyến mãi: 140.000đ / kg  ==> giảm được 20%" -s');
         console.log('    $ vntk tokenize test.txt another.txt -f');
-        console.log('    $ vntk tokenize test.txt another.txt -f -s');
         console.log();
     });
 
