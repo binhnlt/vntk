@@ -142,6 +142,57 @@ program
     });
 
 program
+    .command("tokenize [text...]")
+    .alias("tok")
+    .description("Word Tokenizer")
+    .option("-f, --file", "input is files")
+    .option("-s, --string", "output as string")
+    .action(function (text, options) {
+        console.log('input: %s', text);
+        console.log('isFile: %s', !!options.file);
+        console.log('string', options.string);
+        // console.log("typeof text: ", typeof text);
+
+        // check input
+        var input = text + "";
+        if (!input) {
+            console.log("input is required");
+            this.emit("--help");
+            return;
+        }
+
+        var tokenizer = vntk.tokenizer;
+
+        if (!options.file) {
+            text.forEach(function (e) {
+                console.log(e);
+                if(options.string)
+                    var seg = tokenizer.stokenize(e);
+                else
+                    var seg = tokenizer.tokenize(e);
+                console.log("Output:", seg);
+            }, this);
+        } else {
+            text.forEach(function (e) {
+                if(options.string)
+                    var seg = tokenizer.stokenize(e);
+                else
+                    var seg = tokenizer.tokenize(e);
+                console.log(seg);
+            }, this);
+        }
+
+    }).on("--help", function () {
+        console.log('  Examples:');
+        console.log();
+        console.log('    $ vntk tokenize "Giá khuyến mãi: 140.000đ / kg  ==> giảm được 20%"');
+        console.log('    $ vntk tokenize "Giá khuyến mãi: 140.000đ / kg  ==> giảm được 20%" -s');
+        console.log('    $ vntk tokenize test.txt another.txt -f');
+        console.log('    $ vntk tokenize test.txt another.txt -f -s');
+        console.log();
+    });
+
+program
     .command("*")
     .action(help);
 
