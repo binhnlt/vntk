@@ -27,12 +27,12 @@
   "homepage": "https://github.com/vunb/vntk",
   "dependencies": {
     "@vntk/dictionary": "^1.0.0",
-    "async": "2.0.1",
+    "async": "2.6.4",
     "commander": "2.9.0",
     "crfsuite": "^0.9.3",
     "debug": "^3.1.0",
     "fasttext": "^0.1.0",
-    "lodash": "4.15.0",
+    "lodash": "4.17.21",
     "title-case": "^2.1.1"
   },
   "devDependencies": {
